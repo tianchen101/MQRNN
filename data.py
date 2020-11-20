@@ -35,30 +35,34 @@ def read_df(config:dict):
 
 
 class MQRNN_dataset(Dataset):
-
-    def __init__(self, series_df:pd.DataFrame, covariate_df:pd.DataFrame, horizon_size:int,quantile_size:int):
-        assert(series_df.shape[0] == covariate_df.shape[0])
+    
+    def __init__(self,
+                series_df:pd.DataFrame,
+                covariate_df:pd.DataFrame, 
+                horizon_size:int,
+                quantile_size:int):
+        
         self.series_df = series_df
         self.covariate_df = covariate_df
         self.horizon_size = horizon_size
         self.quantile_size = quantile_size
-
         full_covariate = []
+        covariate_size = self.covariate_df.shape[1]
         print(f"self.covariate_df.shape[0] : {self.covariate_df.shape[0]}")
         for i in range(1, self.covariate_df.shape[0] - horizon_size+1):
-          cur_covariate = []
-          #for j in range(horizon_size):
-          cur_covariate.append(self.covariate_df.iloc[i:i+horizon_size,:].to_numpy())
-          full_covariate.append(cur_covariate)
+            cur_covariate = []
+            #for j in range(horizon_size):
+            cur_covariate.append(self.covariate_df.iloc[i:i+horizon_size,:].to_numpy())
+            full_covariate.append(cur_covariate)
         full_covariate = np.array(full_covariate)
         print(f"full_covariate shape: {full_covariate.shape}")
         full_covariate = full_covariate.reshape(-1, horizon_size * covariate_size)
         self.next_covariate = full_covariate
-
+    
     def __len__(self):
         return self.series_df.shape[1]
     
-    def __getitem__(self, idx):
+    def __getitem__(self,idx):
         cur_series = np.array(self.series_df.iloc[: -self.horizon_size, idx])
         cur_covariate = np.array(self.covariate_df.iloc[:-self.horizon_size, :]) # covariate used in generating hidden states
 
@@ -79,4 +83,5 @@ class MQRNN_dataset(Dataset):
 
         cur_real_vals_tensor = torch.tensor(real_vals_array)
         return cur_series_covariate_tensor, next_covariate_tensor, cur_real_vals_tensor
+
 
