@@ -5,7 +5,7 @@ from .Decoder import GlobalDecoder,LocalDecoder
 from .train_func import train_fn
 from .data import MQRNN_dataset
 
-class MQRNN(nn.Module):
+class MQRNN(object):
     """
     This class holds the encoder and the global decoder and local decoder.
     """
