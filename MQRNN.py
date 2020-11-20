@@ -2,8 +2,8 @@ import torch
 import torch.nn
 from .Encoder import Encoder
 from .Decoder import GlobalDecoder,LocalDecoder
-from train_func import train_fn
-from data import MQRNN_dataset
+from .train_func import train_fn
+from .data import MQRNN_dataset
 
 class MQRNN(object):
     """

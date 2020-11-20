@@ -1,7 +1,7 @@
 import torch
-from Encoder import Encoder
-from Decoder import GlobalDecoder, LocalDecoder
-from data import MQRNN_dataset
+from .Encoder import Encoder
+from .Decoder import GlobalDecoder, LocalDecoder
+from .data import MQRNN_dataset
 from torch.utils.data import DataLoader
 
 def calc_loss(cur_series_covariate_tensor : torch.Tensor, 
