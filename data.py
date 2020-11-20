@@ -30,7 +30,7 @@ def read_df(config:dict):
     test_covariate_df = covariate_df.iloc[-horizon_size:,:]
 
     train_target_df = train_target_df.iloc[-1000:,:]
-    train_covariate_df = train_covariate_df.iloc[-100:,:]
+    train_covariate_df = train_covariate_df.iloc[-1000:,:]
     return train_target_df, test_target_df, train_covariate_df, test_covariate_df
 
 
