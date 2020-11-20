@@ -2,7 +2,7 @@ import torch
 from Encoder import Encoder
 from Decoder import GlobalDecoder, LocalDecoder
 from data import MQRNN_dataset
-
+from torch.utils.data import DataLoader
 
 def calc_loss(cur_series_covariate_tensor : torch.Tensor, 
             next_covariate_tensor: torch.Tensor,
@@ -63,7 +63,7 @@ def train_fn(encoder:Encoder,
     gdecoder_optimizer = torch.optim.Adam(gdecoder.parameters(),lr=lr)
     ldecoder_optimizer = torch.optim.Adam(ldecoder.parameters(), lr=lr)
 
-    data_iter = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,num_workers=4)
+    data_iter = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,num_workers=0)
     l_sum = 0.0
     for i in range(num_epochs):
         #print(f"epoch_num:{i}")

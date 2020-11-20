@@ -1,5 +1,7 @@
 import pandas as pd 
 import numpy as np
+import torch
+from torch.utils.data import Dataset
 
 
 def read_df(config:dict):
@@ -38,10 +40,11 @@ class MQRNN_dataset(Dataset):
                 quantile_size:int):
         
         self.series_df = series_df
-        self.covaraite_df = covariate_df
+        self.covariate_df = covariate_df
         self.horizon_size = horizon_size
         self.quantile_size = quantile_size
         full_covariate = []
+        covariate_size = self.covariate_df.shape[1]
         print(f"self.covariate_df.shape[0] : {self.covariate_df.shape[0]}")
         for i in range(1, self.covariate_df.shape[0] - horizon_size+1):
             cur_covariate = []

@@ -16,7 +16,7 @@ class MQRNN(object):
                 columns:list, 
                 dropout:float,
                 layer_size:int,
-                by_directoin:bool,
+                by_direction:bool,
                 lr:float,
                 batch_size:int, 
                 num_epochs:int, 
@@ -27,7 +27,11 @@ class MQRNN(object):
         self.device = device
         self.horizon_size = horizon_size
         self.quantile_size = len(quantiles)
-
+        self.lr = lr 
+        self.batch_size = batch_size
+        self.num_epochs = num_epochs
+        
+        quantile_size = self.quantile_size
         self.encoder = Encoder(horizon_size=horizon_size,
                                covariate_size=covariate_size,
                                hidden_size=hidden_size, 
@@ -49,7 +53,7 @@ class MQRNN(object):
         self.gdecoder.double()
         self.ldecoder.double()
     
-    def train(dataset:MQRNN_dataset):
+    def train(self, dataset:MQRNN_dataset):
         
         train_fn(encoder=self.encoder, 
                 gdecoder=self.gdecoder, 
@@ -61,7 +65,7 @@ class MQRNN(object):
                 device=self.device)
         print("training finished")
     
-    def predict(train_target_df, train_covariate_df, test_covariate_df, col_name):
+    def predict(self,train_target_df, train_covariate_df, test_covariate_df, col_name):
 
         input_target_tensor = torch.tensor(train_target_df[[col_name]].to_numpy())
         full_covariate = train_covariate_df.to_numpy()

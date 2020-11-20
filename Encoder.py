@@ -10,7 +10,7 @@ class Encoder(nn.Module):
 
     """
     def __init__(self, 
-                horison_size:int, 
+                horizon_size:int, 
                 covariate_size:int, 
                 hidden_size:int, 
                 dropout:float, 
@@ -18,7 +18,7 @@ class Encoder(nn.Module):
                 by_direction:bool,
                 device):
         super(Encoder, self).__init__()
-        self.horizon_size =horison_size
+        self.horizon_size =horizon_size
         self.covariate_size = covariate_size
         self.hidden_size = hidden_size
         self.layer_size = layer_size
