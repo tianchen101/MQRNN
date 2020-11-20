@@ -1,11 +1,11 @@
 import torch
-import torch.nn
+import torch.nn as nn
 from .Encoder import Encoder
 from .Decoder import GlobalDecoder,LocalDecoder
 from .train_func import train_fn
 from .data import MQRNN_dataset
 
-class MQRNN(object):
+class MQRNN(nn.Module):
     """
     This class holds the encoder and the global decoder and local decoder.
     """
