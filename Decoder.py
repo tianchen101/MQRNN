@@ -64,7 +64,7 @@ class LocalDecoder(nn.Module):
 
         self.linear1 = nn.Linear(in_features= horizon_size*context_size + horizon_size* covariate_size + context_size,
                                  out_features= horizon_size* context_size)
-        self.lienar2 = nn.Linear(in_features= horizon_size* context_size,
+        self.linear2 = nn.Linear(in_features= horizon_size* context_size,
                                  out_features= horizon_size* quantile_size)
         self.activation = nn.ReLU()
     

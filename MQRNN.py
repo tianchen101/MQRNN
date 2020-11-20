@@ -1,7 +1,7 @@
 import torch
 import torch.nn
-from Encoder import Encoder
-from Decoder import GlobalDecoder,LocalDecoder
+from .Encoder import Encoder
+from .Decoder import GlobalDecoder,LocalDecoder
 from train_func import train_fn
 from data import MQRNN_dataset
 
@@ -27,10 +27,11 @@ class MQRNN(object):
         self.device = device
         self.horizon_size = horizon_size
         self.quantile_size = len(quantiles)
+        self.quantiles = quantiles
         self.lr = lr 
         self.batch_size = batch_size
         self.num_epochs = num_epochs
-        
+        self.covariate_size = covariate_size
         quantile_size = self.quantile_size
         self.encoder = Encoder(horizon_size=horizon_size,
                                covariate_size=covariate_size,
@@ -72,7 +73,7 @@ class MQRNN(object):
         full_covariate_tensor = torch.tensor(full_covariate)
 
         next_covariate = test_covariate_df.to_numpy()
-        next_covariate = next_covariate.reshape(-1, self.horizon_size)
+        next_covariate = next_covariate.reshape(-1, self.horizon_size * self.covariate_size)
         next_covariate_tensor = torch.tensor(next_covariate) #[1,horizon_size * covariate_size]
 
         input_target_tensor = input_target_tensor.to(self.device)
@@ -80,11 +81,11 @@ class MQRNN(object):
         next_covariate_tensor = next_covariate_tensor.to(self.device)
 
         with torch.no_grad():
-            input_target_covariate_tensor = torch.cat([input_target_tensor, input_covariate_tensor], dim=1)
+            input_target_covariate_tensor = torch.cat([input_target_tensor, full_covariate_tensor], dim=1)
             input_target_covariate_tensor = torch.unsqueeze(input_target_covariate_tensor, dim= 0) #[1, seq_len, 1+covariate_size]
             input_target_covariate_tensor = input_target_covariate_tensor.permute(1,0,2) #[seq_len, 1, 1+covariate_size]
             print(f"input_target_covariate_tensor shape: {input_target_covariate_tensor.shape}")
-            outputs = encoder(input_target_covariate_tensor) #[seq_len,1,hidden_size]
+            outputs = self.encoder(input_target_covariate_tensor) #[seq_len,1,hidden_size]
             hidden = torch.unsqueeze(outputs[-1],dim=0) #[1,1,hidden_size]
 
             next_covariate_tensor = torch.unsqueeze(next_covariate_tensor, dim=0)
@@ -93,10 +94,10 @@ class MQRNN(object):
             print(f"hidden shape: {hidden.shape}")
             print(f"next_covariate_tensor: {next_covariate_tensor.shape}")
             gdecoder_input = torch.cat([hidden, next_covariate_tensor], dim=2) #[1,1, hidden + covariate_size* horizon_size]
-            gdecoder_output = gdecoder( gdecoder_input) #[1,1,(horizon_size+1)*context_size]
+            gdecoder_output = self.gdecoder( gdecoder_input) #[1,1,(horizon_size+1)*context_size]
 
             local_decoder_input = torch.cat([gdecoder_output, next_covariate_tensor], dim=2) #[1, 1,(horizon_size+1)*context_size + covariate_size * horizon_size]
-            local_decoder_output = ldecoder( local_decoder_input) #[seq_len, batch_size, horizon_size* quantile_size]
+            local_decoder_output = self.ldecoder( local_decoder_input) #[seq_len, batch_size, horizon_size* quantile_size]
             local_decoder_output = local_decoder_output.view(self.horizon_size,self.quantile_size)
             output_array = local_decoder_output.cpu().numpy()
             result_dict= {}
